@@ -1,4 +1,4 @@
-﻿    using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -7,7 +7,5 @@ namespace WebAPI.Controllers
     {
         protected IMediator? Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
         private IMediator? _mediator;
-
-
     }
 }
