@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Core.Security.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -39,6 +40,9 @@ namespace Persistence.Contexts
 
             });
 
+            ProgrammingLanguage[] programmingLanguages = { new(1, "Java"), new(2, "C#") };
+            modelBuilder.Entity<ProgrammingLanguage>().HasData(programmingLanguages);
+
             modelBuilder.Entity<Technology>(a =>
             {
                 a.ToTable("Technologies").HasKey(k => k.Id);
@@ -49,11 +53,51 @@ namespace Persistence.Contexts
                 a.HasOne(a => a.ProgrammingLanguage);
             });
 
-            ProgrammingLanguage[] programmingLanguages = { new(1, "Java"), new(2, "C#") };
-            modelBuilder.Entity<ProgrammingLanguage>().HasData(programmingLanguages);
-
             Technology[] technologies = { new(1, "Spring", 1), new(2, "JSP", 1), new(3, "WPF", 2), new(4, "ASP.NET", 2) };
             modelBuilder.Entity<Technology>().HasData(technologies);
+
+            modelBuilder.Entity<OperationClaim>(a =>
+            {
+                a.ToTable("OperationClaims").HasKey(k => k.Id);
+                a.Property(t => t.Id).HasColumnName("Id");
+                a.Property(t => t.Name).HasColumnName("Name");
+            });
+
+            OperationClaim[] operationClaims = { new(1, "Moderator"), new(2, "Admin") };
+            modelBuilder.Entity<OperationClaim>().HasData(operationClaims);
+
+
+            modelBuilder.Entity<UserOperationClaim>(a =>
+            {
+                a.ToTable("UserOperationClaims").HasKey(k => k.Id);
+                a.Property(t => t.Id).HasColumnName("Id");
+                a.Property(t => t.UserId).HasColumnName("UserId");
+                a.Property(t => t.OperationClaimId).HasColumnName("OperationClaimId");
+
+                a.HasOne(a => a.OperationClaim);
+                a.HasOne(a => a.User);
+
+            });
+
+            modelBuilder.Entity<User>(a =>
+            {
+                a.ToTable("Users").HasKey(k => k.Id);
+                a.Property(t => t.Id).HasColumnName("Id");
+                a.Property(t => t.FirstName).HasColumnName("FirstName");
+                a.Property(t => t.LastName).HasColumnName("LastName");
+                a.Property(t => t.Email).HasColumnName("Email");
+                a.Property(t => t.Status).HasColumnName("Status");
+                a.Property(t => t.PasswordHash).HasColumnName("PasswordHash");
+                a.Property(t => t.PasswordSalt).HasColumnName("PasswordSalt");
+                a.Property(t => t.AuthenticatorType).HasColumnName("AuthenticatorType");
+
+                a.HasMany(a => a.RefreshTokens);
+                a.HasMany(a => a.UserOperationClaims);
+            });
+
+            
+
+            
 
             
         }
