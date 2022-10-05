@@ -9,13 +9,20 @@ namespace Domain.Entities
 {
     public class SocialMedia: Entity
     {
-        public int UserId { get; set; }
-        public string Name { get; set; }
+        public int DeveloperId { get; set; }
         public string Url { get; set; }
+        public string Name { get; set; }
 
-        public SocialMedia(int id, int userId, string url, string name) : base(id)
+        public virtual Developer? Developer { get; set; }
+
+        public SocialMedia()
         {
-            UserId = userId;
+
+        }
+
+        public SocialMedia(int id, int developerId, string url, string name) : base(id)
+        {
+            developerId = developerId;
             Url = url;
             Name = name;
         }

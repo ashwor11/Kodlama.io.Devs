@@ -7,6 +7,8 @@ using Application.Features.ProgrammingLanguages.Rules;
 using Application.Features.Technologies.Rules;
 using Application.Features.Users.Rules;
 using Core.Security.JWT;
+using Application.Features.SocialMedias.Rules;
+using Application.Services.AuthService;
 
 namespace Application
 {
@@ -20,7 +22,9 @@ namespace Application
 
             services.AddScoped<ProgrammingLanguageBusinessRules>();
             services.AddScoped<TechnologyBusinessRules>();
-            services.AddScoped<UserBusinessRules>();
+            services.AddScoped<DeveloperBusinessRules>();
+            services.AddScoped<SocialMediaBusinessRules>();
+            
             
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -29,6 +33,8 @@ namespace Application
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheRemovingBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+
+            services.AddScoped<IDeveloperService, DeveloperManager>();
 
             return services;
 

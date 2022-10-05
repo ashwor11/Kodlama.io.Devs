@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Dtos
 {
-    public class LoginUserDto
+    public class LoggedInUserDto: RefreshedTokenDto
     {
     }
 }

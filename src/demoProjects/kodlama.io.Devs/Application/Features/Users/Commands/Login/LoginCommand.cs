@@ -5,6 +5,7 @@ using AutoMapper;
 using Core.Security.Entities;
 using Core.Security.Hashing;
 using Core.Security.JWT;
+using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,43 +16,43 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Commands.Login
 {
-    public class LoginCommand: IRequest<AccessTokenDto>
+    public class LoginCommand: IRequest<LoggedInUserDto>
     {
         public string Email { get; set; }
         public string Password { get; set; }
 
 
-        public class LoginCommandHandler : IRequestHandler<LoginCommand, AccessTokenDto>
+        public class LoginCommandHandler : IRequestHandler<LoginCommand, LoggedInUserDto>
         {
             IMapper _mapper;
-            IUserRepository _userRepository;
-            UserBusinessRules _userBusinessRules;
+            IDeveloperRepository _developerRepository;
+            DeveloperBusinessRules _developerBusinessRules;
             IUserOperationClaimRepository _userOperationClaimRepository;
             ITokenHelper _tokenHelper;
 
-            public LoginCommandHandler(IMapper mapper, IUserRepository userRepository, UserBusinessRules userBusinessRules, IUserOperationClaimRepository userOperationClaimRepository, ITokenHelper tokenHelper)
+            public LoginCommandHandler(IMapper mapper, IDeveloperRepository developerRepository, DeveloperBusinessRules developerBusinessRules, IUserOperationClaimRepository userOperationClaimRepository, ITokenHelper tokenHelper)
             {
                 _mapper = mapper;
-                _userRepository = userRepository;
-                _userBusinessRules = userBusinessRules;
+                _developerRepository = developerRepository;
+                _developerBusinessRules = developerBusinessRules;
                 _userOperationClaimRepository = userOperationClaimRepository;
                 _tokenHelper = tokenHelper;
             }
 
-            public async Task<AccessTokenDto> Handle(LoginCommand request, CancellationToken cancellationToken)
+            public async Task<LoggedInUserDto> Handle(LoginCommand request, CancellationToken cancellationToken)
             {
-                User? developer = await _userRepository.GetAsync(u => u.Email == request.Email);
-                _userBusinessRules.UserEmailShouldBeOnSystemWhenRequested(developer);
-                _userBusinessRules.UserPasswordMustBeCorrect(request.Password, developer.PasswordHash, developer.PasswordSalt);
+                Developer? developer = await _developerRepository.GetAsync(u => u.Email == request.Email);
+                _developerBusinessRules.UserEmailShouldBeOnSystemWhenRequested(developer);
+                _developerBusinessRules.UserPasswordMustBeCorrect(request.Password, developer.PasswordHash, developer.PasswordSalt);
 
                 var userOperationClaims = await _userOperationClaimRepository.GetListAsync(
                                                                                      predicate: o => o.UserId == developer.Id,
                                                                                      include: o => o.Include(c => c.OperationClaim));
-                IList<OperationClaim> operationClaims = new List<OperationClaim>();
+                
 
-                AccessToken accessToken = _tokenHelper.CreateToken(developer, operationClaims);
+                AccessToken accessToken = _tokenHelper.CreateToken(developer, userOperationClaims.Items.Select(p => p.OperationClaim).ToList());
 
-                AccessTokenDto accessTokenDto = _mapper.Map<AccessTokenDto>(accessToken);
+                LoggedInUserDto accessTokenDto = _mapper.Map<LoggedInUserDto>(accessToken);
 
                 return accessTokenDto;
 

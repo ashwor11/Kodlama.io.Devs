@@ -15,6 +15,10 @@ namespace Persistence.Contexts
         protected IConfiguration Configuration { get; set; }
         public DbSet<ProgrammingLanguage> ProgrammingLanguages { get; set; }
         public DbSet<Technology> Technologies { get; set; }
+        public DbSet<SocialMedia> SocialMedias{ get; set; }
+        public DbSet<RefreshToken> RefreshTokens{ get; set; }
+        public DbSet<OperationClaim> OperationClaims { get; set; }
+        public DbSet<UserOperationClaim> UserOperationClaims{ get; set; }
 
         public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : base(dbContextOptions)
         {
@@ -93,6 +97,22 @@ namespace Persistence.Contexts
 
                 a.HasMany(a => a.RefreshTokens);
                 a.HasMany(a => a.UserOperationClaims);
+            });
+
+            modelBuilder.Entity<Developer>(a =>
+            {
+                a.HasMany(a => a.SocialMedias);
+            });
+
+            modelBuilder.Entity<SocialMedia>(a =>
+            {
+                a.ToTable("SocialMedias").HasKey(k => k.Id);
+                a.Property(s => s.Id).HasColumnName("Id");
+                a.Property(s => s.DeveloperId).HasColumnName("DeveloperId");
+                a.Property(s => s.Name).HasColumnName("Name");
+                a.Property(s => s.Url).HasColumnName("Url");
+
+                a.HasOne(s => s.Developer);
             });
 
             

@@ -10,7 +10,7 @@ namespace Domain.Entities
 {
     public class Developer: User
     {
-        public string? GithubUrl  { get; set; }
+        public ICollection<SocialMedia> SocialMedias  { get; set; }
 
         public Developer()
         {
@@ -19,7 +19,7 @@ namespace Domain.Entities
 
         public Developer(string githubUrl): this()
         {
-            GithubUrl = githubUrl;
+            
         }
     }
 }
