@@ -1,7 +1,9 @@
 ﻿using Application.Features.Users.Dtos;
 using Application.Features.Users.Rules;
+using Application.Services.AuthService;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Security.Dtos;
 using Core.Security.Entities;
 using Core.Security.Hashing;
 using Core.Security.JWT;
@@ -16,45 +18,42 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Commands.Login
 {
-    public class LoginCommand: IRequest<LoggedInUserDto>
+    public class LoginCommand : IRequest<LoggedInUserDto>
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public UserForLoginDto UserForLoginDto{get; set;}
+        public string IpAddress { get; set; }
 
 
         public class LoginCommandHandler : IRequestHandler<LoginCommand, LoggedInUserDto>
         {
-            IMapper _mapper;
             IDeveloperRepository _developerRepository;
             DeveloperBusinessRules _developerBusinessRules;
             IUserOperationClaimRepository _userOperationClaimRepository;
             ITokenHelper _tokenHelper;
+            IDeveloperService _developerService;
 
-            public LoginCommandHandler(IMapper mapper, IDeveloperRepository developerRepository, DeveloperBusinessRules developerBusinessRules, IUserOperationClaimRepository userOperationClaimRepository, ITokenHelper tokenHelper)
+            public LoginCommandHandler(IDeveloperRepository developerRepository, DeveloperBusinessRules developerBusinessRules, IUserOperationClaimRepository userOperationClaimRepository, ITokenHelper tokenHelper, IDeveloperService developerService)
             {
-                _mapper = mapper;
                 _developerRepository = developerRepository;
                 _developerBusinessRules = developerBusinessRules;
                 _userOperationClaimRepository = userOperationClaimRepository;
                 _tokenHelper = tokenHelper;
+                _developerService = developerService;
             }
 
             public async Task<LoggedInUserDto> Handle(LoginCommand request, CancellationToken cancellationToken)
             {
-                Developer? developer = await _developerRepository.GetAsync(u => u.Email == request.Email);
+                Developer? developer = await _developerRepository.GetAsync(u => u.Email == request.UserForLoginDto.Email);
                 _developerBusinessRules.UserEmailShouldBeOnSystemWhenRequested(developer);
-                _developerBusinessRules.UserPasswordMustBeCorrect(request.Password, developer.PasswordHash, developer.PasswordSalt);
+                _developerBusinessRules.UserPasswordMustBeCorrect(request.UserForLoginDto.Password, developer.PasswordHash, developer.PasswordSalt);
 
-                var userOperationClaims = await _userOperationClaimRepository.GetListAsync(
-                                                                                     predicate: o => o.UserId == developer.Id,
-                                                                                     include: o => o.Include(c => c.OperationClaim));
-                
+                AccessToken accessToken = await _developerService.CreateAccessToken(developer);
+                RefreshToken refreshToken = await _developerService.CreateRefreshToken(developer, request.IpAddress);
 
-                AccessToken accessToken = _tokenHelper.CreateToken(developer, userOperationClaims.Items.Select(p => p.OperationClaim).ToList());
 
-                LoggedInUserDto accessTokenDto = _mapper.Map<LoggedInUserDto>(accessToken);
+                LoggedInUserDto loggedInUserDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };
 
-                return accessTokenDto;
+                return loggedInUserDto;
 
                 
             }
