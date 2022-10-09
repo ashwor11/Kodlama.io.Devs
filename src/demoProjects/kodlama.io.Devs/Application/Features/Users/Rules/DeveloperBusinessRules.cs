@@ -1,8 +1,11 @@
-﻿using Application.Services.Repositories;
+﻿using Application.Services.AuthService;
+using Application.Services.Repositories;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Persistence.Paging;
 using Core.Security.Entities;
+using Core.Security.Extensions;
 using Core.Security.Hashing;
+using Core.Security.JWT;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -16,10 +19,12 @@ namespace Application.Features.Users.Rules
     {
 
         private readonly IDeveloperRepository _userRepository;
+        private readonly IDeveloperService _developerService;
 
-        public DeveloperBusinessRules(IDeveloperRepository userRepository)
+        public DeveloperBusinessRules(IDeveloperRepository userRepository, IDeveloperService developerService)
         {
             _userRepository = userRepository;
+            _developerService = developerService;
         }
 
         public async Task EmailCanNotBeDuplicated(string email)
@@ -36,7 +41,39 @@ namespace Application.Features.Users.Rules
 
         public void UserPasswordMustBeCorrect(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            HashingHelper.VerifyPasswordHash(password, passwordHash, passwordSalt);
+            if (!HashingHelper.VerifyPasswordHash(password, passwordHash, passwordSalt)) throw new BusinessException("Password is wrong");
+        }
+
+        public void AccessTokenMustBeExpiredToRefresh(AccessToken accessToken)
+        {
+            if (accessToken.Expiration > DateTime.Now) throw new BusinessException("Access token still valid");
+        }
+
+        public void RefreshTokenMustBeExistWhenRequested(RefreshToken refreshToken)
+        {
+            if (refreshToken == null) throw new AuthorizationException("Refresh token is null");
+        }
+
+        public void RefreshTokenMustNotBeExpireated(RefreshToken refreshToken)
+        {
+            if (refreshToken.Expires < DateTime.Now) throw new AuthorizationException("Refresh token is expired");
+        }
+
+        public void RefreshTokenMustNotBeRevoked(RefreshToken refreshToken)
+        {
+            if (refreshToken.Revoked != null) throw new AuthorizationException("Refresh token is already revoked");
+        }
+
+        public void RefreshTokenAndAccessTokenMustOwnSameUser(RefreshToken refreshToken, AccessToken accessToken)
+        {
+            var claims = _developerService.GetPrincipleFromToken(accessToken);
+
+            if (claims.GetUserId() != refreshToken.UserId) throw new AuthorizationException("Refresh token and Access token does not match");
+
+        }
+        public void DeveloperMustBeExistWhenRequested(Developer developer)
+        {
+            if (developer == null) throw new BusinessException("Developer is not exists");
         }
     }
 }

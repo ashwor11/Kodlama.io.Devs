@@ -43,8 +43,8 @@ public class JwtHelper : ITokenHelper
         {
             UserId = user.Id,
             Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-            Expires = DateTime.UtcNow.AddDays(_tokenOptions.RefreshTokenTTL),
-            Created = DateTime.UtcNow,
+            Expires = DateTime.Now.AddDays(_tokenOptions.RefreshTokenTTL),
+            Created = DateTime.Now,
             CreatedByIp = ipAddress
         };
 
@@ -75,4 +75,19 @@ public class JwtHelper : ITokenHelper
         claims.AddRoles(operationClaims.Select(c => c.Name).ToArray());
         return claims;
     }
+
+    public bool IsTokenExpired(AccessToken accessToken)
+    {
+        if (accessToken.Expiration < DateTime.Now) return true;
+        return false;
+    }
+
+    public ClaimsPrincipal ValidateToken(string token)
+    {
+        JwtSecurityTokenHandler jwtSecurityTokenHandler = new();
+        //jwtSecurityTokenHandler.ValidateToken(token)
+        return null;
+    }
+
+
 }

@@ -9,6 +9,10 @@ using Application.Features.Users.Rules;
 using Core.Security.JWT;
 using Application.Features.SocialMedias.Rules;
 using Application.Services.AuthService;
+using Core.Application.Pipelines.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Core.Security.Encryption;
+using Microsoft.Extensions.Configuration;
 
 namespace Application
 {
@@ -16,6 +20,7 @@ namespace Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
@@ -26,9 +31,10 @@ namespace Application
             services.AddScoped<SocialMediaBusinessRules>();
             
             
+            
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheRemovingBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
@@ -39,5 +45,8 @@ namespace Application
             return services;
 
         }
+       
     }
+
+   
 }

@@ -1,12 +1,14 @@
 ﻿using Application.Services.Repositories;
+using Core.Security.Encryption;
 using Core.Security.Entities;
 using Core.Security.JWT;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
 
 namespace Application.Services.AuthService
 {
@@ -16,14 +18,15 @@ namespace Application.Services.AuthService
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IUserOperationClaimRepository _userOperationClaimRepository;
         private readonly IOperationClaimRepository _operationClaimRepository;
+        private readonly IConfiguration _configuration;
 
-        public DeveloperManager(ITokenHelper tokenHelper, IRefreshTokenRepository refreshTokenRepository, IUserOperationClaimRepository userOperationClaimRepository, IOperationClaimRepository operationClaimRepository)
+        public DeveloperManager(ITokenHelper tokenHelper, IRefreshTokenRepository refreshTokenRepository, IUserOperationClaimRepository userOperationClaimRepository, IOperationClaimRepository operationClaimRepository, TokenValidationParameters tokenValidationParameters, IConfiguration configuration)
         {
             _tokenHelper = tokenHelper;
             _refreshTokenRepository = refreshTokenRepository;
             _userOperationClaimRepository = userOperationClaimRepository;
             _operationClaimRepository = operationClaimRepository;
-
+            _configuration = configuration;
         }
 
         public async Task<RefreshToken> AddRefreshToken(RefreshToken refreshToken)
@@ -34,7 +37,7 @@ namespace Application.Services.AuthService
 
         public async Task<AccessToken> CreateAccessToken(User user)
         {
-            var claims = await _userOperationClaimRepository.GetListAsync(predicate: u=> u.Id == user.Id,
+            var claims = await _userOperationClaimRepository.GetListAsync(predicate: u=> u.UserId == user.Id,
                                                                     include: u => u.Include(u=> u.OperationClaim));
             IList<OperationClaim> operationClaims =claims.Items.Select(u => new OperationClaim() { Id = u.OperationClaim.Id, Name = u.OperationClaim.Name }).ToList();
 
@@ -56,6 +59,64 @@ namespace Application.Services.AuthService
             return refreshToken;
         }
 
+        public ClaimsPrincipal? GetPrincipleFromToken(AccessToken accessToken)
+        {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(accessToken.Token, GetTokenValidationParameters(), out var validatedToken);
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         
+        public bool IsTokenValid(AccessToken accessToken)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+           
+                tokenHandler.ValidateToken(accessToken.Token, GetTokenValidationParameters(), out var validatedToken);
+                return true;
+            
+        }
+
+        public async Task<RefreshToken> RevokeRefreshToken(RefreshToken refreshToken, string ipAddress, string replacedToken, string reasonRevoked)
+        {
+            refreshToken.Revoked = DateTime.Now;
+            refreshToken.ReasonRevoked = reasonRevoked;
+            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.ReplacedByToken = replacedToken;
+            return await _refreshTokenRepository.UpdateAsync(refreshToken);
+        }
+
+        private bool IsValidJwtAlghoritm(SecurityToken validatedToken)
+        {
+            return (validatedToken is JwtSecurityToken jwtSecurityToken)
+                   && jwtSecurityToken.Header.Alg
+                       .Equals(SecurityAlgorithms.HmacSha512, System.StringComparison.InvariantCultureIgnoreCase);
+        }
+        private TokenValidationParameters GetTokenValidationParameters()
+        {
+            TokenOptions tokenOptions = _configuration.GetSection("TokenOptions").Get<TokenOptions>();
+            var tokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidAudience = tokenOptions.Audience,
+                ValidIssuer = tokenOptions.Issuer,
+                ValidateLifetime = false,
+                IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
+            };
+            return tokenValidationParameters;
+        }
+
+
     }
 }

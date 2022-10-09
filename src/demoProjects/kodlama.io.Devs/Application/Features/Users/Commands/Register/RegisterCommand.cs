@@ -29,19 +29,13 @@ namespace Application.Features.Users.Commands.Register
             private readonly IDeveloperRepository _developerRepository;
             private readonly IMapper _mapper;
             private readonly DeveloperBusinessRules _developerBusinessRules;
-            private readonly ITokenHelper _tokenHelper;
-            private readonly IUserOperationClaimRepository _userOperationClaimRepository;
-            private readonly IOperationClaimRepository _operationClaimRepository;
             private readonly IDeveloperService _developerService;
 
-            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, DeveloperBusinessRules developerBusinessRules, ITokenHelper tokenHelper, IUserOperationClaimRepository userOperationClaimRepository, IOperationClaimRepository operationClaimRepository, IDeveloperService developerService)
+            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, DeveloperBusinessRules developerBusinessRules, IDeveloperService developerService)
             {
                 _developerRepository = developerRepository;
                 _mapper = mapper;
                 _developerBusinessRules = developerBusinessRules;
-                _tokenHelper = tokenHelper;
-                _userOperationClaimRepository = userOperationClaimRepository;
-                _operationClaimRepository = operationClaimRepository;
                 _developerService = developerService;
             }
 
@@ -63,6 +57,9 @@ namespace Application.Features.Users.Commands.Register
 
                 RefreshToken refreshToken = await _developerService.CreateRefreshToken(newUser, request.IpAddress);
                 AccessToken accessToken = await _developerService.CreateAccessToken(newUser);
+
+                _developerService.AddRefreshToken(refreshToken);
+
 
                 RegisteredDto registeredDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };
                 return registeredDto;

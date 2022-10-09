@@ -1,10 +1,14 @@
 ﻿using Application.Features.Users.Commands.Login;
+using Application.Features.Users.Commands.Refresh;
 using Application.Features.Users.Commands.Register;
 using Application.Features.Users.Dtos;
 using Core.Security.Dtos;
 using Core.Security.Entities;
+using Core.Security.JWT;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace WebAPI.Controllers
 {
@@ -38,6 +42,20 @@ namespace WebAPI.Controllers
             LoggedInUserDto loggedInUserDto = await Mediator.Send(command);
             SetRefreshTokenToCookie(loggedInUserDto.RefreshToken);
             return Ok(loggedInUserDto.AccessToken);
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Login([FromBody] AccessToken accessToken)
+        {
+            string? refreshToken = Request.Cookies["refreshToken"];
+            if (refreshToken == null) return BadRequest();
+            RefreshTokenCommand command = new()
+            {
+                RefreshTokenDto = new () { AccessToken = accessToken, RefreshToken = refreshToken },
+                IpAddress = GetIpAddress()
+            };
+            RefreshedTokenDto refreshedTokenDto = await Mediator.Send(command);
+            SetRefreshTokenToCookie(refreshedTokenDto.RefreshToken);
+            return Ok(refreshedTokenDto.AccessToken);
         }
 
         private void SetRefreshTokenToCookie(RefreshToken refreshToken)

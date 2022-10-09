@@ -50,6 +50,8 @@ namespace Application.Features.Users.Commands.Login
                 AccessToken accessToken = await _developerService.CreateAccessToken(developer);
                 RefreshToken refreshToken = await _developerService.CreateRefreshToken(developer, request.IpAddress);
 
+                _developerService.AddRefreshToken(refreshToken);
+
 
                 LoggedInUserDto loggedInUserDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };
 
