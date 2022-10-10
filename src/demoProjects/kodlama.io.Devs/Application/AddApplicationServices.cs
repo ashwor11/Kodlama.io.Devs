@@ -13,6 +13,8 @@ using Core.Application.Pipelines.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Core.Security.Encryption;
 using Microsoft.Extensions.Configuration;
+using Application.Features.OperationClaims.Rules;
+using Application.Features.UserOperationClaims.Rules;
 
 namespace Application
 {
@@ -29,6 +31,8 @@ namespace Application
             services.AddScoped<TechnologyBusinessRules>();
             services.AddScoped<DeveloperBusinessRules>();
             services.AddScoped<SocialMediaBusinessRules>();
+            services.AddScoped<OperationClaimBusinessRules>();
+            services.AddScoped<UserOperationClaimBusinessRules>();
             
             
             

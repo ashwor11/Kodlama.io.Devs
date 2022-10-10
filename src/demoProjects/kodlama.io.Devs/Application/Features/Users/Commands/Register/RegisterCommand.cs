@@ -20,8 +20,8 @@ namespace Application.Features.Users.Commands.Register
 {
     public class RegisterCommand: IRequest<RegisteredDto>
     {
-        public UserForRegisterDto UserForRegisterDto { get; set; }
-        public string IpAddress { get; set; }
+        public UserForRegisterDto? UserForRegisterDto { get; set; }
+        public string? IpAddress { get; set; }
 
 
         public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisteredDto>
@@ -58,7 +58,7 @@ namespace Application.Features.Users.Commands.Register
                 RefreshToken refreshToken = await _developerService.CreateRefreshToken(newUser, request.IpAddress);
                 AccessToken accessToken = await _developerService.CreateAccessToken(newUser);
 
-                _developerService.AddRefreshToken(refreshToken);
+                await _developerService.AddRefreshToken(refreshToken);
 
 
                 RegisteredDto registeredDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };

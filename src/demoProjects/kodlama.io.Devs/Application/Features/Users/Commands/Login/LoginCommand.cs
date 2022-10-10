@@ -20,8 +20,8 @@ namespace Application.Features.Users.Commands.Login
 {
     public class LoginCommand : IRequest<LoggedInUserDto>
     {
-        public UserForLoginDto UserForLoginDto{get; set;}
-        public string IpAddress { get; set; }
+        public UserForLoginDto? UserForLoginDto{get; set;}
+        public string? IpAddress { get; set; }
 
 
         public class LoginCommandHandler : IRequestHandler<LoginCommand, LoggedInUserDto>
@@ -50,7 +50,7 @@ namespace Application.Features.Users.Commands.Login
                 AccessToken accessToken = await _developerService.CreateAccessToken(developer);
                 RefreshToken refreshToken = await _developerService.CreateRefreshToken(developer, request.IpAddress);
 
-                _developerService.AddRefreshToken(refreshToken);
+                await _developerService.AddRefreshToken(refreshToken);
 
 
                 LoggedInUserDto loggedInUserDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };

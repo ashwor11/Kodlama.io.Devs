@@ -15,7 +15,7 @@ namespace Application.Features.Technologies.Commands.UpdateTechnology
     public class UpdateTechnologyCommand : IRequest<UpdatedTechnologyDto>
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int ProgrammingLanguageId { get; set; }
 
 
@@ -34,7 +34,7 @@ namespace Application.Features.Technologies.Commands.UpdateTechnology
 
             public async Task<UpdatedTechnologyDto> Handle(UpdateTechnologyCommand request, CancellationToken cancellationToken)
             {
-                _technologyBusinessRules.TechnologyCanNotBeDuplicatedWhenUpdated(request.Name);
+                await _technologyBusinessRules.TechnologyCanNotBeDuplicatedWhenUpdated(request.Name);
 
                 Technology technology = _mapper.Map<Technology>(request);
                 Technology updatedTechnology = await _technologyRepository.UpdateAsync(technology);

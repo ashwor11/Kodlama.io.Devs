@@ -25,20 +25,16 @@ namespace Application.Features.Users.Commands.Refresh
 
         public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshedTokenDto>
         {
-            private readonly ITokenHelper _tokenHelper;
             private readonly IRefreshTokenRepository _refreshTokenRepository;
             private readonly IDeveloperRepository _developerRepository;
             private readonly IDeveloperService _developerService;
-            private readonly IHttpContextAccessor _httpContextAccessor;
             private readonly DeveloperBusinessRules _developerBusinessRules;
 
-            public RefreshTokenCommandHandler(ITokenHelper tokenHelper, IRefreshTokenRepository refreshTokenRepository, IDeveloperRepository developerRepository, IDeveloperService developerService, IHttpContextAccessor httpContextAccessor, DeveloperBusinessRules developerBusinessRules)
+            public RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IDeveloperRepository developerRepository, IDeveloperService developerService, DeveloperBusinessRules developerBusinessRules)
             {
-                _tokenHelper = tokenHelper;
                 _refreshTokenRepository = refreshTokenRepository;
                 _developerRepository = developerRepository;
                 _developerService = developerService;
-                _httpContextAccessor = httpContextAccessor;
                 _developerBusinessRules = developerBusinessRules;
             }
 

@@ -55,7 +55,7 @@ namespace Application.Services.AuthService
 
         public async Task<RefreshToken> CreateRefreshToken(User user, string ipAddress)
         {
-            RefreshToken refreshToken =  _tokenHelper.CreateRefreshToken(user, ipAddress);
+            RefreshToken refreshToken = _tokenHelper.CreateRefreshToken(user, ipAddress);
             return refreshToken;
         }
 
