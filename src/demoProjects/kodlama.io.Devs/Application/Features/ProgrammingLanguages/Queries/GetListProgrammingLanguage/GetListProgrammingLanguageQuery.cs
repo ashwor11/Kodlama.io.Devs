@@ -1,6 +1,7 @@
 ﻿using Application.Features.ProgrammingLanguages.Models;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Application.Pipelines.Caching;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
 using Domain.Entities;
@@ -13,9 +14,15 @@ using System.Threading.Tasks;
 
 namespace Application.Features.ProgrammingLanguages.Queries.GetListProgrammingLanguage
 {
-    public class GetListProgrammingLanguageQuery : IRequest<ProgrammingLanguageListModel>
+    public class GetListProgrammingLanguageQuery : IRequest<ProgrammingLanguageListModel>, ICachableRequest
     {
         public PageRequest PageRequest { get; set; }
+
+        public bool BypassCache { get; set; }
+
+        public string CacheKey => "programminglanguage-list";
+
+        public TimeSpan? SlidingExpiration { get; set; }
 
         public class GetListProgrammingLanguageQueryHandler : IRequestHandler<GetListProgrammingLanguageQuery, ProgrammingLanguageListModel>
         {

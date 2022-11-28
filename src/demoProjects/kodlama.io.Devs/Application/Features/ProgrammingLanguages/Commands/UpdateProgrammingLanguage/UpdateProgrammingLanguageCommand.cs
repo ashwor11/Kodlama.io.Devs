@@ -2,6 +2,7 @@
 using Application.Features.ProgrammingLanguages.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Application.Pipelines.Caching;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -12,10 +13,14 @@ using System.Threading.Tasks;
 
 namespace Application.Features.ProgrammingLanguages.Commands.UpdateProgrammingLanguage
 {
-    public class UpdateProgrammingLanguageCommand: IRequest<UpdatedProgrammingLanguageDto>
+    public class UpdateProgrammingLanguageCommand: IRequest<UpdatedProgrammingLanguageDto>, ICacheRemoverRequest
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        public bool BypassCache { get; set; }
+
+        public string CacheKey => "programminglanguage-list";
 
         public class UpdateProgrammingLanguageCommandHandler : IRequestHandler<UpdateProgrammingLanguageCommand, UpdatedProgrammingLanguageDto>
         {

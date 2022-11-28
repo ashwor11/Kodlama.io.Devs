@@ -37,6 +37,8 @@ TokenValidationParameters validationParameters = new()
     ClockSkew = TimeSpan.Zero
 };
 
+builder.Services.AddDistributedMemoryCache(); // in memory
+//builder.Services.AddStackExchangeRedisCache(opt => opt.Configuration = "localhost:6379");
 builder.Services.AddSingleton(validationParameters);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

@@ -3,6 +3,7 @@ using Application.Features.ProgrammingLanguages.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Pipelines.Authorization;
+using Core.Application.Pipelines.Caching;
 using Core.Application.Pipelines.Logging;
 using Domain.Entities;
 using MediatR;
@@ -14,11 +15,15 @@ using System.Threading.Tasks;
 
 namespace Application.Features.ProgrammingLanguages.Commands.CreateProgrammingLanguage
 {
-    public partial class CreateProgrammingLanguageCommand : IRequest<CreatedProgrammingLanguageDto> , ISecuredRequest, ILoggableRequest
+    public partial class CreateProgrammingLanguageCommand : IRequest<CreatedProgrammingLanguageDto> , ISecuredRequest, ILoggableRequest, ICacheRemoverRequest
     {
         public string Name { get; set; }
 
         public string[] Roles => new[] { "programminglanguage", "Admin" };
+
+        public bool BypassCache { get; set; }
+
+        public string CacheKey => "programminglanguage-list";
 
         public class CreateProgrammingLangugaeCommandHandler : IRequestHandler<CreateProgrammingLanguageCommand, CreatedProgrammingLanguageDto>
         {
