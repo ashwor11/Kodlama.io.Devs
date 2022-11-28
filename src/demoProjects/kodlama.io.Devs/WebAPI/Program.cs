@@ -33,7 +33,8 @@ TokenValidationParameters validationParameters = new()
     ValidIssuer = tokenOptions.Issuer,
     ValidAudience = tokenOptions.Audience,
     ValidateIssuerSigningKey = true,
-    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
+    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey),
+    ClockSkew = TimeSpan.Zero
 };
 
 builder.Services.AddSingleton(validationParameters);

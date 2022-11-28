@@ -28,7 +28,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             Type = request.GetType().Name,
             Value = request
         });
-
+        
         LogDetail logDetail = new()
         {
             MethodName = next.Method.Name,

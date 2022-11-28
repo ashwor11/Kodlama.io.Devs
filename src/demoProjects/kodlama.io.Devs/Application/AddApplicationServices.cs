@@ -15,6 +15,10 @@ using Core.Security.Encryption;
 using Microsoft.Extensions.Configuration;
 using Application.Features.OperationClaims.Rules;
 using Application.Features.UserOperationClaims.Rules;
+using Core.ElasticSearch;
+using Core.Application.Pipelines.Logging;
+using Core.CrossCuttingConcerns.Logging.Serilog.Logger;
+using Core.CrossCuttingConcerns.Logging.Serilog;
 
 namespace Application
 {
@@ -41,10 +45,13 @@ namespace Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheRemovingBehavior<,>));
-            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddScoped<IDeveloperService, DeveloperManager>();
+
+            services.AddSingleton<LoggerServiceBase, FileLogger>();
+            services.AddSingleton<IElasticSearch, ElasticSearchManager>();
 
             return services;
 

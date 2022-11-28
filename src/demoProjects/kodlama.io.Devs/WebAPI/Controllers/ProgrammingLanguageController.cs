@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Delete([FromBody] DeleteProgrammingLanguageCommand request)
         {
             DeletedProgrammingLanguageDto result = await Mediator.Send(request);
-            return Ok(result);
+            return NoContent();
         }
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetList([FromRoute] GetByIdProgrammingLanguageQuery request)

@@ -20,7 +20,7 @@ namespace Application.Features.UserOperationClaims.Queries.GetListByUser
     {
         public int UserId { get; set; }
 
-        public string[] Roles => new string[] {"admin"};
+        public string[] Roles => new string[] {"Admin"};
 
         public class GetListByUserUserOperationClaimQueryHandler : IRequestHandler<GetListByUserUserOperationClaimQuery, GetListByUserUserOperationClaimModel>
         {

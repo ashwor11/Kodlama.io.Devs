@@ -41,7 +41,7 @@ namespace Application.Features.Users.Commands.Refresh
             public async Task<RefreshedTokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
             {
                 _developerService.IsTokenValid(request.RefreshTokenDto.AccessToken);
-                _developerBusinessRules.AccessTokenMustBeExpiredToRefresh(request.RefreshTokenDto.AccessToken);
+                //_developerBusinessRules.AccessTokenMustBeExpiredToRefresh(request.RefreshTokenDto.AccessToken);
 
                 ClaimsPrincipal claims = _developerService.GetPrincipleFromToken(request.RefreshTokenDto.AccessToken);
 

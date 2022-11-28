@@ -111,7 +111,7 @@ namespace Application.Services.AuthService
             {
                 ValidAudience = tokenOptions.Audience,
                 ValidIssuer = tokenOptions.Issuer,
-                ValidateLifetime = false,
+                ValidateLifetime = true,
                 IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
             };
             return tokenValidationParameters;

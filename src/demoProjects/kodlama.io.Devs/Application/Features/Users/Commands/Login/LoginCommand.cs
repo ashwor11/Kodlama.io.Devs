@@ -3,6 +3,7 @@ using Application.Features.Users.Rules;
 using Application.Services.AuthService;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Application.Pipelines.Logging;
 using Core.Security.Dtos;
 using Core.Security.Entities;
 using Core.Security.Hashing;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Commands.Login
 {
-    public class LoginCommand : IRequest<LoggedInUserDto>
+    public class LoginCommand : IRequest<LoggedInUserDto>, ILoggableRequest
     {
         public UserForLoginDto? UserForLoginDto{get; set;}
         public string? IpAddress { get; set; }

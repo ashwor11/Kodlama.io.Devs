@@ -3,6 +3,7 @@ using Core.Security.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Core.Application.Pipelines.Authorization;
 
