@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 
@@ -15,7 +16,7 @@ public class MailKitMailService : IMailService
         _mailSettings = configuration.GetSection("MailSettings").Get<MailSettings>();
     }
 
-    public void SendMail(Mail mail)
+    public async void SendMail(Mail mail)
     {
         MimeMessage email = new();
 
@@ -38,9 +39,9 @@ public class MailKitMailService : IMailService
         email.Body = bodyBuilder.ToMessageBody();
 
         using SmtpClient smtp = new();
-        smtp.Connect(_mailSettings.Server, _mailSettings.Port);
-        //smtp.Authenticate(_mailSettings.UserName, _mailSettings.Password);
-        smtp.Send(email);
-        smtp.Disconnect(true);
+        await smtp.ConnectAsync(_mailSettings.Server, _mailSettings.Port, SecureSocketOptions.Auto);
+        await smtp.AuthenticateAsync(_mailSettings.UserName, _mailSettings.Password);
+        await smtp.SendAsync(email);
+        await smtp.DisconnectAsync(true);
     }
 }

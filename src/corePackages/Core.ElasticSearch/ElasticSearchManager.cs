@@ -15,14 +15,15 @@ public class ElasticSearchManager : IElasticSearch
     {
         ElasticSearchConfig? settings = configuration.GetSection("ElasticSearchConfig").Get<ElasticSearchConfig>();
         SingleNodeConnectionPool pool = new(new Uri(settings.ConnectionString));
-        _connectionSettings = new ConnectionSettings(pool, (builtInSerializer, connectionSettings) =>
+        _connectionSettings = new ConnectionSettings(pool, 
+                                                        sourceSerializer:(builtInSerializer, connectionSettings) =>
                                                          new JsonNetSerializer(
                                                              builtInSerializer, connectionSettings, () =>
                                                                  new JsonSerializerSettings
                                                                  {
                                                                      ReferenceLoopHandling =
                                                                          ReferenceLoopHandling.Ignore
-                                                                 }));
+                                                                 })).BasicAuthentication(settings.UserName,settings.Password);
     }
 
 

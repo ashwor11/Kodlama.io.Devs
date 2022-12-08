@@ -20,6 +20,8 @@ using Core.Application.Pipelines.Logging;
 using Core.CrossCuttingConcerns.Logging.Serilog.Logger;
 using Core.CrossCuttingConcerns.Logging.Serilog;
 using Core.Application.Pipelines.Caching;
+using Core.Mailing.MailKitImplementations;
+using Core.Mailing;
 
 namespace Application
 {
@@ -50,6 +52,7 @@ namespace Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddScoped<IDeveloperService, DeveloperManager>();
+            services.AddScoped<IMailService, MailKitMailService>();
 
             services.AddSingleton<LoggerServiceBase, FileLogger>();
             services.AddSingleton<IElasticSearch, ElasticSearchManager>();

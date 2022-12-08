@@ -3,6 +3,7 @@ using Application.Features.Users.Rules;
 using Application.Services.AuthService;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Mailing;
 using Core.Security.Dtos;
 using Core.Security.Entities;
 using Core.Security.Hashing;
@@ -30,17 +31,20 @@ namespace Application.Features.Users.Commands.Register
             private readonly IMapper _mapper;
             private readonly DeveloperBusinessRules _developerBusinessRules;
             private readonly IDeveloperService _developerService;
+            private readonly IMailService _mailService;
 
-            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, DeveloperBusinessRules developerBusinessRules, IDeveloperService developerService)
+            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, DeveloperBusinessRules developerBusinessRules, IDeveloperService developerService, IMailService mailService)
             {
                 _developerRepository = developerRepository;
                 _mapper = mapper;
                 _developerBusinessRules = developerBusinessRules;
                 _developerService = developerService;
+                _mailService = mailService;
             }
 
             public async Task<RegisteredDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
             {
+                
                 await _developerBusinessRules.EmailCanNotBeDuplicated(request.UserForRegisterDto.Email);
 
                 Byte[] passwordHash, passwordSalt;
@@ -62,6 +66,14 @@ namespace Application.Features.Users.Commands.Register
 
 
                 RegisteredDto registeredDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };
+                _mailService.SendMail(new Mail
+                {
+                    Subject = "Your account has been created.",
+                    TextBody = "Your account created. Have a nice day.",
+                    ToEmail = request.UserForRegisterDto.Email,
+                    ToFullName = request.UserForRegisterDto.FirstName + " " + request.UserForRegisterDto.LastName
+                });
+
                 return registeredDto;
 
             }
