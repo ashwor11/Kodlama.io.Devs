@@ -29,11 +29,11 @@ namespace Application.Features.Users.Commands.Register
         {
             private readonly IDeveloperRepository _developerRepository;
             private readonly IMapper _mapper;
-            private readonly DeveloperBusinessRules _developerBusinessRules;
-            private readonly IDeveloperService _developerService;
+            private readonly AuthBusinessRules _developerBusinessRules;
+            private readonly IAuthService _developerService;
             private readonly IMailService _mailService;
 
-            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, DeveloperBusinessRules developerBusinessRules, IDeveloperService developerService, IMailService mailService)
+            public RegisterCommandHandler(IDeveloperRepository developerRepository, IMapper mapper, AuthBusinessRules developerBusinessRules, IAuthService developerService, IMailService mailService)
             {
                 _developerRepository = developerRepository;
                 _mapper = mapper;
@@ -44,7 +44,13 @@ namespace Application.Features.Users.Commands.Register
 
             public async Task<RegisteredDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
             {
-                
+                _mailService.SendMail(new Mail
+                {
+                    Subject = "Your account has been created.",
+                    TextBody = "Your account created. Have a nice day.",
+                    ToEmail = request.UserForRegisterDto.Email,
+                    ToFullName = request.UserForRegisterDto.FirstName + " " + request.UserForRegisterDto.LastName
+                });
                 await _developerBusinessRules.EmailCanNotBeDuplicated(request.UserForRegisterDto.Email);
 
                 Byte[] passwordHash, passwordSalt;
@@ -66,13 +72,7 @@ namespace Application.Features.Users.Commands.Register
 
 
                 RegisteredDto registeredDto = new() { AccessToken = accessToken, RefreshToken = refreshToken };
-                _mailService.SendMail(new Mail
-                {
-                    Subject = "Your account has been created.",
-                    TextBody = "Your account created. Have a nice day.",
-                    ToEmail = request.UserForRegisterDto.Email,
-                    ToFullName = request.UserForRegisterDto.FirstName + " " + request.UserForRegisterDto.LastName
-                });
+                
 
                 return registeredDto;
 

@@ -22,6 +22,7 @@ using Core.CrossCuttingConcerns.Logging.Serilog;
 using Core.Application.Pipelines.Caching;
 using Core.Mailing.MailKitImplementations;
 using Core.Mailing;
+using Application.Services.UserService;
 
 namespace Application
 {
@@ -36,7 +37,7 @@ namespace Application
 
             services.AddScoped<ProgrammingLanguageBusinessRules>();
             services.AddScoped<TechnologyBusinessRules>();
-            services.AddScoped<DeveloperBusinessRules>();
+            services.AddScoped<AuthBusinessRules>();
             services.AddScoped<SocialMediaBusinessRules>();
             services.AddScoped<OperationClaimBusinessRules>();
             services.AddScoped<UserOperationClaimBusinessRules>();
@@ -51,8 +52,9 @@ namespace Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
-            services.AddScoped<IDeveloperService, DeveloperManager>();
+            services.AddScoped<IAuthService, AuthManager>();
             services.AddScoped<IMailService, MailKitMailService>();
+            services.AddScoped<IUserService, UserManager>();
 
             services.AddSingleton<LoggerServiceBase, FileLogger>();
             services.AddSingleton<IElasticSearch, ElasticSearchManager>();

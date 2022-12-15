@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Dtos
 {
-    public class LoggedInUserDto: RefreshedTokenDto
+    public class EnableEmailVertificationDto
     {
+        public int UserId { get; set; }
+        public string VerifyEmailPrefix { get; set; }
     }
 }

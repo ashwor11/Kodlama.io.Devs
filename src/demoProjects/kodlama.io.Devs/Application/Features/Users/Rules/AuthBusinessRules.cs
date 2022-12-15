@@ -3,6 +3,7 @@ using Application.Services.Repositories;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Persistence.Paging;
 using Core.Security.Entities;
+using Core.Security.Enums;
 using Core.Security.Extensions;
 using Core.Security.Hashing;
 using Core.Security.JWT;
@@ -15,13 +16,13 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Users.Rules
 {
-    public class DeveloperBusinessRules
+    public class AuthBusinessRules
     {
 
         private readonly IDeveloperRepository _userRepository;
-        private readonly IDeveloperService _developerService;
+        private readonly IAuthService _developerService;
 
-        public DeveloperBusinessRules(IDeveloperRepository userRepository, IDeveloperService developerService)
+        public AuthBusinessRules(IDeveloperRepository userRepository, IAuthService developerService)
         {
             _userRepository = userRepository;
             _developerService = developerService;
@@ -73,7 +74,33 @@ namespace Application.Features.Users.Rules
         }
         public void DeveloperMustBeExistWhenRequested(Developer developer)
         {
-            if (developer == null) throw new BusinessException("Developer is not exists");
+            if (developer == null) throw new BusinessException("Developer does not exist");
+        }
+        public Task UserShouldNotHaveAuthenticator(User user)
+        {
+            if (user.AuthenticatorType != AuthenticatorType.None) throw new BusinessException("User already have an authenticator type.");
+            return Task.CompletedTask;
+        }
+        public void UserMustBeExistWhenRequested(User user)
+        {
+            if (user == null) throw new BusinessException("User does not exist");
+        }
+        public void AuthenticatorMustBeExistWhenRequested(EmailAuthenticator emailAuthenticator)
+        {
+            if (emailAuthenticator == null) throw new BusinessException("Email authenticator does not exist.");
+        }
+
+        public void ActivationKeyMustBeExistWhenRequested(EmailAuthenticator emailAuthenticator)
+        {
+            if (emailAuthenticator.ActivationKey == null) throw new BusinessException("Email authenticator activation key does not exist.");
+        }
+        public void OtpAuthenticatorThatVerifiedShouldNotBeExist(OtpAuthenticator? otpAuthenticator)
+        {
+            if (otpAuthenticator != null && otpAuthenticator.IsVerified == true) throw new BusinessException("Verified Otp Authenticator Should Not Be Exist.");
+        }
+        public void OtpAuthenticatorShouldBeExist(OtpAuthenticator otpAuthenticator)
+        {
+            if (otpAuthenticator == null) throw new BusinessException("Otp Authenticator shoul be exist.");
         }
     }
 }

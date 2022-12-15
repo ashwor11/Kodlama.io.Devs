@@ -1,7 +1,7 @@
 ﻿using Core.Persistence.Repositories;
 
 namespace Core.Security.Entities;
-
+[Serializable]
 public class OtpAuthenticator : Entity
 {
     public int UserId { get; set; }

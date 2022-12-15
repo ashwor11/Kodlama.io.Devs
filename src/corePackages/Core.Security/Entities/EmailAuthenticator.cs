@@ -21,4 +21,6 @@ public class EmailAuthenticator : Entity
         ActivationKey = activationKey;
         IsVerified = isVerified;
     }
+
+    
 }

@@ -27,10 +27,10 @@ namespace Application.Features.Users.Commands.Refresh
         {
             private readonly IRefreshTokenRepository _refreshTokenRepository;
             private readonly IDeveloperRepository _developerRepository;
-            private readonly IDeveloperService _developerService;
-            private readonly DeveloperBusinessRules _developerBusinessRules;
+            private readonly IAuthService _developerService;
+            private readonly AuthBusinessRules _developerBusinessRules;
 
-            public RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IDeveloperRepository developerRepository, IDeveloperService developerService, DeveloperBusinessRules developerBusinessRules)
+            public RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IDeveloperRepository developerRepository, IAuthService developerService, AuthBusinessRules developerBusinessRules)
             {
                 _refreshTokenRepository = refreshTokenRepository;
                 _developerRepository = developerRepository;

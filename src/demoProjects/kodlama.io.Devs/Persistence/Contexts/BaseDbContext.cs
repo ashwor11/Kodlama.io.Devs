@@ -34,6 +34,7 @@ namespace Persistence.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseDbContext).Assembly);
             modelBuilder.Entity<ProgrammingLanguage>(a =>
             {
                 a.ToTable("ProgrammingLanguages").HasKey(k => k.Id);

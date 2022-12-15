@@ -30,4 +30,9 @@ public class OtpNetOtpAuthenticatorHelper : IOtpAuthenticatorHelper
 
         return Task.FromResult(result);
     }
+
+    public Task<string> CreateCode(byte[] secretKet)
+    {
+        throw new NotImplementedException();
+    }
 }

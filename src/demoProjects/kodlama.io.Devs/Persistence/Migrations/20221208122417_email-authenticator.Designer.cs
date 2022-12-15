@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Contexts;
 
@@ -11,9 +12,10 @@ using Persistence.Contexts;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    partial class BaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221208122417_email-authenticator")]
+    partial class emailauthenticator
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,33 +23,6 @@ namespace Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Core.Security.Entities.EmailAuthenticator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ActivationKey")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("ActivationKey");
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsVerified");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("EmailAuthenticators", (string)null);
-                });
 
             modelBuilder.Entity("Core.Security.Entities.OperationClaim", b =>
                 {
@@ -78,34 +53,6 @@ namespace Persistence.Migrations
                             Id = 2,
                             Name = "Admin"
                         });
-                });
-
-            modelBuilder.Entity("Core.Security.Entities.OtpAuthenticator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit")
-                        .HasColumnName("IsVerified");
-
-                    b.Property<byte[]>("SecretKey")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)")
-                        .HasColumnName("SecretKey");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OtpAuthenticators", (string)null);
                 });
 
             modelBuilder.Entity("Core.Security.Entities.RefreshToken", b =>
@@ -348,28 +295,6 @@ namespace Persistence.Migrations
                     b.HasBaseType("Core.Security.Entities.User");
 
                     b.HasDiscriminator().HasValue("Developer");
-                });
-
-            modelBuilder.Entity("Core.Security.Entities.EmailAuthenticator", b =>
-                {
-                    b.HasOne("Core.Security.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Core.Security.Entities.OtpAuthenticator", b =>
-                {
-                    b.HasOne("Core.Security.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Security.Entities.RefreshToken", b =>

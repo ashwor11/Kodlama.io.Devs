@@ -27,6 +27,10 @@ namespace Persistence
             services.AddScoped<IOperationClaimRepository, OperationClaimRepository>();
             services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
+            services.AddScoped<IOtpAuthenticatorRepository, OtpAuthenticatorRepository>();
+
 
             return services;
 
